@@ -1,6 +1,6 @@
 const express = require("express");
 const TreatmentPlan = require("../models/TreatmentPlan");
-const { authenticate } = require("../middleware/therapistAuthMiddleware");
+const { authenticate, requireRole } = require("../middleware/therapistAuthMiddleware");
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.get("/therapist/:therapistId", authenticate, async (req, res, next) => {
   }
 });
 
-router.post("/", authenticate, async (req, res, next) => {
+router.post("/", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const created = await TreatmentPlan.create(req.body);
     res.status(201).json(created);
@@ -44,7 +44,7 @@ router.get("/:id", authenticate, async (req, res, next) => {
   }
 });
 
-router.put("/:id", authenticate, async (req, res, next) => {
+router.put("/:id", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const updated = await TreatmentPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ message: "Treatment plan not found" });
@@ -54,7 +54,7 @@ router.put("/:id", authenticate, async (req, res, next) => {
   }
 });
 
-router.patch("/:id/progress", authenticate, async (req, res, next) => {
+router.patch("/:id/progress", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const updated = await TreatmentPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ message: "Treatment plan not found" });
@@ -64,7 +64,7 @@ router.patch("/:id/progress", authenticate, async (req, res, next) => {
   }
 });
 
-router.patch("/:id/status", authenticate, async (req, res, next) => {
+router.patch("/:id/status", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const updated = await TreatmentPlan.findByIdAndUpdate(
       req.params.id,
@@ -78,7 +78,7 @@ router.patch("/:id/status", authenticate, async (req, res, next) => {
   }
 });
 
-router.post("/:id/goals", authenticate, async (req, res, next) => {
+router.post("/:id/goals", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const plan = await TreatmentPlan.findById(req.params.id);
     if (!plan) return res.status(404).json({ message: "Treatment plan not found" });
@@ -90,7 +90,7 @@ router.post("/:id/goals", authenticate, async (req, res, next) => {
   }
 });
 
-router.delete("/:id", authenticate, async (req, res, next) => {
+router.delete("/:id", authenticate, requireRole("admin"), async (req, res, next) => {
   try {
     const deleted = await TreatmentPlan.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Treatment plan not found" });
