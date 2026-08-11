@@ -1,6 +1,6 @@
 const express = require("express");
 const Session = require("../models/Session");
-const { authenticate } = require("../middleware/therapistAuthMiddleware");
+const { authenticate, requireRole } = require("../middleware/therapistAuthMiddleware");
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.get("/date/:date", authenticate, async (req, res, next) => {
   }
 });
 
-router.post("/", authenticate, async (req, res, next) => {
+router.post("/", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const created = await Session.create(req.body);
     res.status(201).json(created);
@@ -56,7 +56,7 @@ router.get("/:id", authenticate, async (req, res, next) => {
   }
 });
 
-router.put("/:id", authenticate, async (req, res, next) => {
+router.put("/:id", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const updated = await Session.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ message: "Session not found" });
@@ -66,7 +66,7 @@ router.put("/:id", authenticate, async (req, res, next) => {
   }
 });
 
-router.patch("/:id/attendance", authenticate, async (req, res, next) => {
+router.patch("/:id/attendance", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const updated = await Session.findByIdAndUpdate(
       req.params.id,
@@ -80,7 +80,7 @@ router.patch("/:id/attendance", authenticate, async (req, res, next) => {
   }
 });
 
-router.patch("/:id/status", authenticate, async (req, res, next) => {
+router.patch("/:id/status", authenticate, requireRole("admin", "therapist"), async (req, res, next) => {
   try {
     const updated = await Session.findByIdAndUpdate(
       req.params.id,
@@ -94,7 +94,7 @@ router.patch("/:id/status", authenticate, async (req, res, next) => {
   }
 });
 
-router.delete("/:id", authenticate, async (req, res, next) => {
+router.delete("/:id", authenticate, requireRole("admin"), async (req, res, next) => {
   try {
     const deleted = await Session.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Session not found" });
