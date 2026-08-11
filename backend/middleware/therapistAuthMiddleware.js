@@ -1,5 +1,12 @@
 const jwt = require("jsonwebtoken");
 
+function getJwtSecret() {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+  return process.env.JWT_SECRET;
+}
+
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
@@ -9,10 +16,13 @@ function authenticate(req, res, next) {
   }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret");
+    const payload = jwt.verify(token, getJwtSecret());
     req.user = payload;
     return next();
   } catch (error) {
+    if (error.message === "JWT_SECRET is not configured") {
+      return res.status(500).json({ message: "Authentication is not configured" });
+    }
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
@@ -29,7 +39,7 @@ function requireRole(...allowedRoles) {
 function signToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || "fallback_secret",
+    getJwtSecret(),
     { expiresIn: "7d" }
   );
 }
