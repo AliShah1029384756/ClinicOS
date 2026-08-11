@@ -1,457 +1,338 @@
 # ClinicOS Project Guide
 
-**Project structure, guidelines, and best practices**
+**Project structure, architecture, security guidance, and development notes**
 
 ---
 
 ## Project Overview
 
-ClinicOS is a therapy management system for autism specialists. It provides patient management, session scheduling, treatment planning, and progress tracking.
+ClinicOS is a full-stack therapy-operations application for autism-care workflows. It demonstrates patient-oriented workflow modelling, therapy session management, treatment planning, therapist workflows, authentication, role-based authorization, and progress tracking.
 
----
-
-## Project Statistics
-
-| Metric | Value |
-|--------|-------|
-| Frontend Components | 18 |
-| Backend Routes | 3 |
-| API Endpoints | 25+ |
-| MongoDB Models | 3 |
-| CSS Files | 15 |
-| Frontend LOC | 2,700+ |
-| Backend LOC | 978 |
-| CSS LOC | 3,500+ |
-
----
-
-## Folder Structure
-
-```
-AutiSmart-ClinicOS/
-├── frontend/
-│   ├── src/
-│   │   ├── components/         ← React components (11 files)
-│   │   ├── pages/              ← Page components (6 files)
-│   │   ├── context/            ← Context API (2 files)
-│   │   ├── styles/             ← CSS files (15 files)
-│   │   ├── utils/              ← Utilities (2 files)
-│   │   ├── App.jsx             ← Main app
-│   │   └── main.jsx            ← Entry point
-│   ├── public/
-│   ├── vite.config.js
-│   ├── package.json
-│   └── .env
-│
-├── backend/
-│   ├── models/                 ← MongoDB models (3 files)
-│   │   ├── Session.js
-│   │   ├── TreatmentPlan.js
-│   │   └── TherapistProfile.js
-│   ├── routes/                 ← API routes (3 files)
-│   │   ├── sessionRoutes.js
-│   │   ├── treatmentPlanRoutes.js
-│   │   └── therapistRoutes.js
-│   ├── middleware/             ← Auth middleware (1 file)
-│   │   └── therapistAuthMiddleware.js
-│   ├── app.js
-│   ├── server.js
-│   ├── package.json
-│   └── .env
-│
-└── Documentation/
-    ├── README.md
-    ├── CLINICOS_COMPLETION_REPORT.md
-    ├── API_DOCUMENTATION.md
-    ├── FRONTEND_SETUP_GUIDE.md
-    ├── PROJECT_GUIDE.md (this file)
-    ├── ROADMAP.md
-    └── [other guides]
-```
+> ClinicOS is an academic/software-engineering project. It is not a clinically validated medical device or production healthcare system.
 
 ---
 
 ## Technology Stack
 
 ### Frontend
-- **Framework**: React 18.2+
-- **Routing**: React Router v6
-- **State**: Context API
-- **Styling**: CSS3 with variables
-- **Build Tool**: Vite
-- **Package Manager**: npm
+- React 18
+- Vite
+- React Router
+- Context API
+- CSS3 / CSS custom properties
 
 ### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB
-- **ODM**: Mongoose
-- **Auth**: JWT
-- **Package Manager**: npm
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT authentication
+- Role-based authorization middleware
 
-### Database
-- **Type**: NoSQL (MongoDB)
-- **Hosting**: Local or MongoDB Atlas
-- **Schema**: Normalized with validation
+### Development
+- npm
+- Environment variables for secrets and deployment-specific configuration
 
 ---
 
-## Component Architecture
+## Architecture
 
-### Frontend Layer
-```
-App.jsx (Router)
-  ├── AuthContext (Global Auth State)
-  ├── ProtectedRoute (Route Guards)
-  │
-  ├── LoginPage
-  ├── TherapistDashboard
-  │   ├── SessionScheduling
-  │   ├── SessionList
-  │   ├── SessionDetails
-  │   ├── TreatmentPlanForm
-  │   ├── GoalTracker
-  │   └── CalendarView
-  ├── AdminDashboard
-  ├── CaregiverPortal
-  └── UnauthorizedPage
-```
-
-### Backend Layer
-```
-Server (app.js)
-  ├── Auth Routes (/auth/login)
-  ├── Session Routes (/sessions)
-  │   ├── GET all sessions
-  │   ├── POST create session
-  │   ├── GET/PUT/:id update
-  │   └── PATCH attendance
-  ├── Treatment Plan Routes (/treatment-plans)
-  │   ├── CRUD operations
-  │   ├── Progress tracking
-  │   └── Approval workflow
-  └── Therapist Routes (/therapists)
-      ├── CRUD operations
-      ├── Stats retrieval
-      └── Availability setting
+```text
+React + Vite Frontend
+        │
+        ├── AuthContext
+        ├── ProtectedRoute
+        ├── Therapist Dashboard
+        ├── Admin Dashboard
+        ├── Caregiver / Patient workflows
+        └── Session / Treatment UI
+        │
+        │ REST API + Bearer JWT
+        ▼
+Node.js + Express Backend
+        │
+        ├── Authentication / RBAC
+        ├── Session Routes
+        ├── Treatment Plan Routes
+        ├── Therapist Routes
+        └── Validation / Error Handling
+        │
+        ▼
+MongoDB + Mongoose
 ```
 
 ---
 
-## API Endpoints Summary
+## Folder Structure
 
-### Sessions (7)
-- `GET /sessions` - List
-- `POST /sessions` - Create
-- `GET /sessions/:id` - Get
-- `PUT /sessions/:id` - Update
-- `DELETE /sessions/:id` - Delete
-- `GET /sessions/therapist/:id` - Filter
-- `PATCH /sessions/:id/attendance` - Attendance
-
-### Treatment Plans (9)
-- `GET /treatment-plans` - List
-- `POST /treatment-plans` - Create
-- `GET /treatment-plans/:id` - Get
-- `PUT /treatment-plans/:id` - Update
-- `DELETE /treatment-plans/:id` - Delete
-- `PATCH /treatment-plans/:id/progress` - Progress
-- `POST /treatment-plans/:id/approve` - Approve
-- `GET /treatment-plans/:id/history` - History
-
-### Therapists (7)
-- `GET /therapists` - List
-- `POST /therapists` - Create
-- `GET /therapists/:id` - Get
-- `PUT /therapists/:id` - Update
-- `DELETE /therapists/:id` - Delete
-- `GET /therapists/:id/stats` - Stats
-- `POST /therapists/:id/availability` - Availability
+```text
+ClinicOS/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── styles/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── public/
+│   └── package.json
+│
+├── backend/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── app.js
+│   ├── server.js
+│   ├── package.json
+│   └── .env.example
+│
+├── API_DOCUMENTATION.md
+├── FRONTEND_SETUP_GUIDE.md
+├── PROJECT_GUIDE.md
+├── CLINICOS_COMPLETION_REPORT.md
+├── CHANGELOG.md
+└── README.md
+```
 
 ---
 
-## Database Schema
+## Core Modules
 
-### Session
-- sessionId (unique)
-- therapistId (ref)
-- patientId (ref)
-- title, description
-- startTime, endTime, duration
-- type (individual/group)
-- status (scheduled/in-progress/completed/cancelled)
-- notes
-- attendanceRecorded
-- timestamps
+### Authentication & Authorization
+JWT-based authentication with role-aware middleware. Protected frontend routes improve navigation control, while authorization must ultimately be enforced by the backend.
 
-### TreatmentPlan
-- planId (unique)
-- patientId (ref)
-- therapistId (ref)
-- title, description
-- status (draft/active/completed/archived)
-- goals (array)
-- interventions (array)
-- duration, startDate, endDate
-- progress (0-100)
-- timestamps
+### Sessions
+- Session listing and filtering
+- Therapist-specific views
+- Date filtering
+- Session creation and editing
+- Attendance and status updates
+- Role-protected mutations
 
-### TherapistProfile
-- userId (ref)
-- name, email
-- specialty (array)
-- credentials (array)
-- licenseNumber
-- yearsOfExperience
-- availability (object)
-- caseLoad
-- bio
-- timestamps
+### Treatment Plans
+- Treatment plan creation and updates
+- Goal management
+- Progress updates
+- Status management
+- Role-protected mutations
+
+### Therapists
+- Therapist profiles
+- Availability
+- Statistics and workflow support
+- Role-aware administration
+
+### Progress
+Progress-oriented data and dashboard workflows support tracking of therapy activity and outcomes within the scope of the academic project.
+
+---
+
+## Security Model
+
+ClinicOS separates **authentication** from **authorization**.
+
+### Authentication
+Requests to protected API resources require a valid Bearer JWT. Tokens use a configured `JWT_SECRET`; there is no insecure hard-coded fallback secret.
+
+### Authorization
+Sensitive mutations are role-protected. Current examples include:
+
+| Operation | Allowed roles |
+|---|---|
+| Create session | Admin, Therapist |
+| Update session | Admin, Therapist |
+| Attendance/status updates | Admin, Therapist |
+| Delete session | Admin |
+| Create treatment plan | Admin, Therapist |
+| Update treatment plan | Admin, Therapist |
+| Progress/status/goal updates | Admin, Therapist |
+| Delete treatment plan | Admin |
+
+> Data-ownership rules for therapist-to-patient assignments should be defined explicitly before introducing stricter record-level restrictions. Do not treat frontend route guards as a security boundary.
+
+### Deployment security checklist
+- Use a strong unique `JWT_SECRET`
+- Set an explicit production `CORS_ORIGIN`
+- Use HTTPS
+- Restrict MongoDB network access
+- Keep credentials outside version control
+- Add authentication rate limiting for production
+- Avoid logging sensitive patient information
+- Validate and sanitize externally supplied input
+
+---
+
+## Environment Configuration
+
+Backend secrets belong in `.env` and must not be committed.
+
+Use the repository's `.env.example` as the safe configuration template. Typical deployment configuration includes:
+
+```text
+MONGO_URI=<your-mongodb-connection-string>
+JWT_SECRET=<strong-random-secret>
+CORS_ORIGIN=<frontend-origin>
+PORT=5000
+```
+
+Never place real credentials in source code or documentation.
+
+---
+
+## Local Development
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Default development API:
+
+```text
+http://localhost:5000
+```
+
+### Frontend
+
+Open another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Default Vite URL:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## API Areas
+
+The backend is organized around these main API areas:
+
+- **Authentication** — login and authenticated sessions
+- **Sessions** — scheduling, filtering, attendance, status, and details
+- **Treatment Plans** — plans, goals, progress, and status
+- **Therapists** — profiles, availability, and statistics
+
+See [`API_DOCUMENTATION.md`](API_DOCUMENTATION.md) for the current endpoint reference.
+
+---
+
+## Frontend Architecture
+
+```text
+App.jsx
+ ├── AuthContext
+ ├── ProtectedRoute
+ ├── LoginPage
+ ├── TherapistDashboard
+ │    ├── SessionScheduling
+ │    ├── SessionList
+ │    ├── SessionDetails
+ │    ├── TreatmentPlanForm
+ │    ├── GoalTracker
+ │    └── CalendarView
+ ├── AdminDashboard
+ ├── Caregiver / Patient workflows
+ └── UnauthorizedPage
+```
+
+### Frontend principles
+- Keep authentication state centralized.
+- Use protected routes for navigation control.
+- Handle loading, error, and empty states.
+- Keep API communication consistent.
+- Maintain responsive and accessible interfaces.
+- Do not rely on frontend role checks as the only security mechanism.
 
 ---
 
 ## Development Conventions
 
-### File Naming
-- Components: PascalCase (SessionScheduling.jsx)
-- Styles: Match component (SessionScheduling.css)
-- Utilities: camelCase (apiHelper.js)
-- Context: PascalCase (AuthContext.jsx)
+### Naming
+- React components: PascalCase
+- Utilities: camelCase
+- Context modules: PascalCase
+- Styles: descriptive component-oriented names
 
-### Code Style
-- Use arrow functions
-- Use const/let (not var)
-- Add JSDoc comments for functions
-- Keep functions small (< 100 LOC)
-- Use semantic HTML
-
-### CSS Conventions
-- Use CSS variables for colors
-- Mobile-first responsive
-- BEM naming for classes
-- Dark theme support
-- Accessibility focus
+### Code quality
+- Prefer `const`/`let` over `var`.
+- Keep functions focused and reasonably small.
+- Handle asynchronous errors explicitly.
+- Avoid duplicated business logic where practical.
+- Keep environment-specific values out of source code.
 
 ---
 
-## Component Development Guide
+## Testing Checklist
 
-### Creating a Component
-```javascript
-// 1. File structure
-components/
-├── MyComponent.jsx    (Logic)
-└── MyComponent.css    (Styles)
+Before considering a meaningful backend change complete:
 
-// 2. Component template
-import React, { useState } from 'react';
-import './MyComponent.css';
+1. Verify authentication with valid and invalid tokens.
+2. Verify expired/missing tokens are rejected.
+3. Verify role-restricted mutations with each relevant role.
+4. Test CRUD operations for affected modules.
+5. Test invalid IDs and malformed payloads.
+6. Test frontend loading/error/empty states.
+7. Test responsive layouts.
+8. Test the development environment after environment-variable changes.
 
-export default function MyComponent({ prop1, prop2 }) {
-  const [state, setState] = useState(null);
-  
-  const handleSelect = (value) => {
-    setState(value);
-  };
-  
-  return (
-    <div className="my-component">
-      {/* JSX here */}
-    </div>
-  );
-}
-
-// 3. Import in App or parent
-import MyComponent from './components/MyComponent';
-```
-
-### Best Practices
-1. ✅ Use functional components
-2. ✅ Use hooks for state
-3. ✅ Prop validation
-4. ✅ Error handling
-5. ✅ Loading states
-6. ✅ Responsive design
-7. ✅ Dark theme support
-8. ✅ Accessibility
+For security-sensitive changes, also verify that authorization is enforced server-side rather than only through frontend visibility.
 
 ---
 
-## State Management
+## Performance Considerations
 
-### Context API Usage
-```javascript
-// AuthContext provides user data globally
-const { user, login, logout, isAuthenticated } = useContext(AuthContext);
+Potential production improvements include:
 
-// Access in any component
-useEffect(() => {
-  if (!isAuthenticated) {
-    navigate('/login');
-  }
-}, [isAuthenticated]);
-```
+- Pagination for large datasets
+- Database indexes for frequently queried fields
+- Query projection and population discipline
+- Route-level code splitting
+- Optimized assets
+- Appropriate caching
 
-### Local State
-```javascript
-// Component-specific state
-const [sessions, setSessions] = useState([]);
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState(null);
-```
-
----
-
-## API Interaction
-
-### Fetch Pattern
-```javascript
-const fetchSessions = async () => {
-  try {
-    setLoading(true);
-    const response = await fetch('/api/sessions', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-      }
-    });
-    const data = await response.json();
-    setSessions(data.data);
-  } catch (error) {
-    setError(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-```
-
-### Error Handling
-```javascript
-if (error) {
-  return <div className="error-message">{error}</div>;
-}
-
-if (loading) {
-  return <div className="spinner">Loading...</div>;
-}
-
-if (sessions.length === 0) {
-  return <div className="empty-state">No sessions found</div>;
-}
-```
-
----
-
-## Testing Approach
-
-### Manual Testing
-1. Test all CRUD operations
-2. Verify role-based access
-3. Check responsive design
-4. Test dark theme
-5. Check error states
-6. Verify API failures handled
-
-### Test Scenarios
-- Create, read, update, delete records
-- Filter and sort data
-- Test pagination
-- Verify form validation
-- Check authentication flow
-
----
-
-## Performance Optimization
-
-### Frontend
-- React.memo for expensive components
-- Lazy loading of routes
-- Image optimization
-- CSS minification
-- Code splitting
-
-### Backend
-- Database indexing
-- Query optimization
-- Connection pooling
-- Caching strategies
-- Pagination
-
----
-
-## Security Practices
-
-### Authentication
-- JWT tokens with expiration
-- Refresh token rotation
-- Secure token storage
-- Protected routes
-
-### Data Protection
-- Input validation
-- Output encoding
-- SQL injection prevention
-- XSS protection
-- CSRF tokens
-
----
-
-## Deployment
-
-### Frontend
-- Build: `npm run build`
-- Deploy to: Vercel, Netlify, S3
-- CDN for assets
-
-### Backend
-- Deploy to: Heroku, Railway, AWS
-- Environment variables configured
-- Database connectivity ensured
-- Logging enabled
-
----
-
-## Common Issues & Solutions
-
-### Issue: API not responding
-**Solution**: Check backend is running, verify CORS_ORIGIN
-
-### Issue: Authentication fails
-**Solution**: Verify JWT_SECRET, check token format
-
-### Issue: Styles not applied
-**Solution**: Check CSS import, verify selector
-
-### Issue: Dark theme not working
-**Solution**: Check data-theme attribute, verify CSS variables
+These should be introduced based on measured needs rather than added solely for complexity.
 
 ---
 
 ## Future Enhancements
 
-### Phase 2
-- Advanced analytics
-- Report generation
-- Email notifications
-- Mobile app
+Potential future work includes:
 
-### Phase 3
-- AI progress prediction
-- Video telemedicine
-- Insurance integration
-- Advanced search
+- Advanced analytics and reporting
+- Notifications
+- More granular patient/therapist ownership rules
+- Automated testing
+- Production-grade rate limiting and observability
+- AI-assisted progress insights
+- Deployment and CI/CD hardening
 
----
-
-## Resources
-
-- [React Documentation](https://react.dev)
-- [Express.js Guide](https://expressjs.com)
-- [MongoDB Documentation](https://docs.mongodb.com)
-- [Mongoose Guide](https://mongoosejs.com)
-- [JWT Explained](https://jwt.io)
-- [Vite Guide](https://vitejs.dev)
+Future ideas are not represented as current production capabilities.
 
 ---
 
-**Last Updated**: March 2026
-**Version**: 1.0.0
+## Project Relationship
+
+ClinicOS belongs to the same broader autism-care problem space as the author's other projects, including **AutiSmart** and **SchoolIEP**. It should be presented as a clinic/therapy-operations-focused application rather than as an unrelated duplicate project.
+
+The exact percentage of reused material should not be claimed publicly unless supported by a documented code/content comparison.
+
+---
+
+## Scope & Disclaimer
+
+ClinicOS is an academic/software-engineering project intended to demonstrate full-stack engineering and healthcare-style workflow modelling. It has not been presented as clinically validated software, a medical device, or evidence of clinical certification.
+
+---
+
+**Last reviewed:** August 2026
+**Status:** Portfolio / academic project
