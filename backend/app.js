@@ -7,7 +7,7 @@ const therapistRoutes = require("./routes/therapistRoutes");
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
 app.use(express.json({ limit: "2mb" }));
 
 app.get("/health", (req, res) => {
