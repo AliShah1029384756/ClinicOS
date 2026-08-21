@@ -98,7 +98,7 @@ See [`API_DOCUMENTATION.md`](API_DOCUMENTATION.md) for the detailed API referenc
 
 ClinicOS uses JWT-based authentication and role-aware authorization middleware.
 
-Environment-specific secrets are supplied through `.env` and excluded from version control. A safe development template is provided at [`backend/.env.example`](backend/.env.example). citeturn62file0
+Environment-specific secrets are supplied through `.env` and excluded from version control. A safe development template is provided at [`backend/.env.example`](backend/.env.example).
 
 For deployment, configure:
 
